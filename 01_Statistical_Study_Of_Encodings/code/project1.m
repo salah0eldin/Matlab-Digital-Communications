@@ -5,14 +5,15 @@ clear;
 %% Define the bit stream
 
 % Number of waveforms and bits
-WAVEFORMS = 500;
+WAVEFORMS = 100000;
 BITS = 100;
+EXTEND_VALUE = 7;
 
 % Generate random bit stream
 bitStream = randi([0, 1], WAVEFORMS, BITS);
 
 % Extend each bit 7 times
-extendedBitStream = repelem(bitStream, 1, 7);
+extendedBitStream = repelem(bitStream, 1, EXTEND_VALUE);
 
 % Voltage Level
 VOLTAGE_LEVEL = 4;
@@ -31,7 +32,7 @@ polarRZ(:, 7:7:end) = 0; % Clears the 7th bit of each 7 bits
 
 %% Plot the signals
 
-figure;
+figure('Position', [100, 100, 1200, 800]);
 plotSignal(5, 1, bitStream(1, 1:11), 'Original Bit Stream (1, 1:11)', [-2 2], 1);
 plotSignal(5, 1, extendedBitStream(1, 1:71), 'Extended Bit Stream (1, 1:11)', [-2 2], 2);
 plotSignal(5, 1, unipolar(1, 1:71), 'Unipolar Signal (1, 1:11)', [-6 6], 3);
@@ -46,17 +47,17 @@ shiftedPolarRZ = applyRandomShifts(polarRZ);
 
 %% Plot the shifted signals
 
-figure;
+figure('Position', [100, 100, 1200, 800]);
 plotSignal(4, 1, unipolar(1, 1:71), 'Unipolar Signal (1, 1:11)', [-6 6], 1);
 plotSignal(4, 1, shiftedUnipolar(1, 1:71), 'Shifted Unipolar Signal (1, 1:11)', [-6 6], 2);
 plotSignal(4, 1, unipolar(2, 1:71), 'Unipolar Signal (2, 1:11)', [-6 6], 3);
 plotSignal(4, 1, shiftedUnipolar(2, 1:71), 'Shifted Unipolar Signal (2, 1:11)', [-6 6], 4);
-figure;
+figure('Position', [100, 100, 1200, 800]);
 plotSignal(4, 1, polarNRZ(1, 1:71), 'PolarNRZ Signal (1, 1:11)', [-6 6], 1);
 plotSignal(4, 1, shiftedPolarNRZ(1, 1:71), 'Shifted PolarNRZ Signal (1, 1:11)', [-6 6], 2);
 plotSignal(4, 1, polarNRZ(2, 1:71), 'PolarNRZ Signal (2, 1:11)', [-6 6], 3);
 plotSignal(4, 1, shiftedPolarNRZ(2, 1:71), 'Shifted PolarNRZ Signal (2, 1:11)', [-6 6], 4);
-figure;
+figure('Position', [100, 100, 1200, 800]);
 plotSignal(4, 1, polarRZ(1, 1:71), 'PolarRZ Signal (1, 1:11)', [-6 6], 1);
 plotSignal(4, 1, shiftedPolarRZ(1, 1:71), 'Shifted PolarRZ Signal (1, 1:11)', [-6 6], 2);
 plotSignal(4, 1, polarRZ(2, 1:71), 'PolarRZ Signal (2, 1:11)', [-6 6], 3);
@@ -64,22 +65,24 @@ plotSignal(4, 1, shiftedPolarRZ(2, 1:71), 'Shifted PolarRZ Signal (2, 1:11)', [-
 
 %% Calculate Outputs
 
-% Initialize table to store the output values to be displayed
-outputTable = cell(2, 4);
-outputTable(1, :) = {'Output', 'Unipolar', 'Polar NRZ', 'Polar RZ'};
+outputUnipolar = shiftedUnipolar;
+outputPolarNRZ = shiftedPolarNRZ;
+outputPolarRZ = shiftedPolarRZ;
 
-% Statistical mean
-meanUnipolar = 0;
-meanPolarNRZ = 0;
-meanPolarRZ = 0;
-outputTable(2, :) = {'Mean', meanUnipolar, meanPolarNRZ, meanPolarRZ};
+%% Statistical mean
 
-% Convert cell array to table to display it better
-outputTable = cell2table(outputTable(2:end, :), 'VariableNames', outputTable(1, :));
+% Calculate the probability of each output for UniPolar encoding cross all waveforms
+meanUnipolar = sum(outputUnipolar) / WAVEFORMS;
+meanPolarNRZ = sum(outputPolarNRZ) / WAVEFORMS;
+meanPolarRZ = sum(outputPolarRZ) / WAVEFORMS;
 
-% Display the table
-outputTable.Output = string(outputTable.Output);
-disp(outputTable);
+% Plot the mean of the Unipolar signal
+figure('Position', [100, 100, 1200, 800]);
+plotSignal(3, 1, meanUnipolar, 'Mean of Unipolar Signal', [-1 5], 1, false);
+plotSignal(3, 1, meanPolarNRZ, 'Mean of Polar NRZ Signal', [-5 5], 2, false);
+plotSignal(3, 1, meanPolarRZ, 'Mean of Polar RZ Signal', [-5 5], 3, false);
+
+%% Stationarity
 
 %% Functions
 
@@ -96,13 +99,19 @@ function shiftedBitStream = applyRandomShifts(extendedBitStream)
 end
 
 % Function to plot signals
-function plotSignal(n, m, signal, titleText, yLimits, subplotIndex)
+function plotSignal(n, m, signal, titleText, yLimits, subplotIndex, xticksFlag)
+    if nargin < 7
+        xticksFlag = true;
+    end
+    
     subplot(n, m, subplotIndex);
     stairs(signal, 'LineWidth', 1.5);
     title(titleText);
     ylim(yLimits);
     grid on;
-    xticks(0:1:length(signal));
+    if xticksFlag
+        xticks(0:1:length(signal));
+    end
     xlim([1 length(signal)]);
     yline(0, '--');
 end
