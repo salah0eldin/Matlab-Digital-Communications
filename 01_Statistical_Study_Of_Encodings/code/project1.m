@@ -5,7 +5,7 @@ clear;
 %% Define the bit stream
 
 % Number of waveforms and bits
-WAVEFORMS = 100000;
+WAVEFORMS = 500;
 BITS = 100;
 EXTEND_VALUE = 7;
 
@@ -52,11 +52,13 @@ plotSignal(4, 1, unipolar(1, 1:71), 'Unipolar Signal (1, 1:11)', [-6 6], 1);
 plotSignal(4, 1, shiftedUnipolar(1, 1:71), 'Shifted Unipolar Signal (1, 1:11)', [-6 6], 2);
 plotSignal(4, 1, unipolar(2, 1:71), 'Unipolar Signal (2, 1:11)', [-6 6], 3);
 plotSignal(4, 1, shiftedUnipolar(2, 1:71), 'Shifted Unipolar Signal (2, 1:11)', [-6 6], 4);
+
 figure('Position', [100, 100, 1200, 800]);
 plotSignal(4, 1, polarNRZ(1, 1:71), 'PolarNRZ Signal (1, 1:11)', [-6 6], 1);
 plotSignal(4, 1, shiftedPolarNRZ(1, 1:71), 'Shifted PolarNRZ Signal (1, 1:11)', [-6 6], 2);
 plotSignal(4, 1, polarNRZ(2, 1:71), 'PolarNRZ Signal (2, 1:11)', [-6 6], 3);
 plotSignal(4, 1, shiftedPolarNRZ(2, 1:71), 'Shifted PolarNRZ Signal (2, 1:11)', [-6 6], 4);
+
 figure('Position', [100, 100, 1200, 800]);
 plotSignal(4, 1, polarRZ(1, 1:71), 'PolarRZ Signal (1, 1:11)', [-6 6], 1);
 plotSignal(4, 1, shiftedPolarRZ(1, 1:71), 'Shifted PolarRZ Signal (1, 1:11)', [-6 6], 2);
